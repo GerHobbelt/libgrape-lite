@@ -846,8 +846,10 @@ nssv_DISABLE_MSVC_WARNINGS( 4455 26481 26472 )
 
     nssv_constexpr size_type find( basic_string_view v, size_type pos = 0 ) const nssv_noexcept  // (1)
     {
-      return assert( v.size() == 0 || v.data() != nssv_nullptr )
-                 , pos >= size()
+	  // fix error C2760: syntax error: 'do' was unexpected here; expected 'expression'
+	  // --> assertions are statements, not expressions.
+      assert(v.size() == 0 || v.data() != nssv_nullptr);
+	  return pos >= size()
                  ? npos : to_pos(
 #if nssv_CPP11_OR_GREATER && ! nssv_CPP17_OR_GREATER
                        detail::search( substr(pos), v )
@@ -1045,7 +1047,11 @@ nssv_DISABLE_MSVC_WARNINGS( 4455 26481 26472 )
 #if nssv_BETWEEN( nssv_COMPILER_GNUC_VERSION, 1, 500 )
       return data_[pos];
 #else
-      return assert( pos < size() ), data_[pos];
+      // fix error C2760: syntax error: 'do' was unexpected here; expected
+      // 'expression'
+      // --> assertions are statements, not expressions.
+      assert(pos < size());
+	  return data_[pos];
 #endif
     }
 
